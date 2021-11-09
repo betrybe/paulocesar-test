@@ -15,16 +15,22 @@ function generateToken(params = {}){
 }
 
 //rota de registro
-router.post('/register', async(req, res) => {
+router.post('/users', async(req, res) => {
     
-    const { email } = req.body;
+    const { name, email, password } = req.body;
 
     try{
 
         if(await User.findOne({ email }))
-            return res.status(400).send({ message: 'Email already registered'});
+            return res.status(409).send({ message: 'Email already registered'});
 
-        
+        if(!name || !email || !password)
+            return res.status(400).send({ message: 'Invalid entries. Try again.'})
+
+        //invalid email 
+        const emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/i;
+        if(!emailRegex.test(email))
+            return res.status(400).send({ message: 'Invalid entries. Try again.'})     
 
         const user = await User.create(req.body);
 
@@ -32,35 +38,46 @@ router.post('/register', async(req, res) => {
 
         return res.status(201).send({ 
             user,
-            token: generateToken({ id: user.id }),
+            //token: generateToken({ id: user.id }),
         });
     }catch(err){
-        return res.status(400).send({ error: 'Registration failed'});
+        console.log(err);
+        return res.status(400).send({ message: 'Registration failed'});
     }
 });
 
 //rota de autenticação
-router.post('/authenticate', async(req, res) => {
+router.post('/login', async(req, res) => {
     const { email, password } = req.body;
 
+    if(!email || !password)
+        return res.status(401).send({ message: 'All fields must be filled'});
+
+    //invalid email 
+    const emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/i;
+    if(!emailRegex.test(email))
+        return res.status(401).send({ message: 'Incorrect username or password'});
+    
     const user = await User.findOne({ email }).select('+password');
 
     if(!user)
-        return res.status(400).send({ error: 'User not found'});
+        return res.status(401).send({ message: 'User not found'});
 
-    if(!await bcrypt.compare(password, user.password))
-        return res.status(400).send({ error: 'Invalid password'})
+    if(password !== user.password)
+        return res.status(401).send({ message: 'Incorrect username or password'})
 
-    user.password = undefined;
+    //user.password = undefined;
 
-    
-
-    res.send({ 
-        user, 
-        token: generateToken({ id: user.id }),
+    res.status(200).send({ 
+        //user, 
+        token: generateToken({ 
+            id: user.id , 
+            email: user.email, 
+            role: user.role
+        }),
     });
     
 });
 
 //toda vez que acessar o /auth chamará esse router
-module.exports = app => app.use('/auth', router);
+module.exports = app => app.use('/', router);

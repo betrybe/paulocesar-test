@@ -1,5 +1,4 @@
 const mongoose = require('../database');
-const bcrypt = require('bcryptjs');
 
 const RecipeSchema = new mongoose.Schema({
     name : {
@@ -22,7 +21,7 @@ const RecipeSchema = new mongoose.Schema({
     imgURL:{
         type: String,
     }
-});
+},{ versionKey: false });
 
 const Recipe = mongoose.model('Recipe', RecipeSchema);
 

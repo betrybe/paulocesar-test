@@ -1,5 +1,5 @@
 const mongoose = require('../database');
-const bcrypt = require('bcryptjs');
+//const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     name : {
@@ -22,19 +22,19 @@ const UserSchema = new mongoose.Schema({
         require: false,
         default: "user"
     },
-    createdAt: {
+    /*createdAt: {
         type: Date,
         default: Date.now,
-    },
-});
+    },*/
+},{ versionKey: false });
 
 //função do mongoose para executar algo antes de salvar
-UserSchema.pre('save', async function(next){
+/*UserSchema.pre('save', async function(next){
     const hash = await bcrypt.hash(this.password, 10);
     this.password = hash;
 
     next();
-});
+});*/
 
 const User = mongoose.model('User', UserSchema);
 
