@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
 
     jwt.verify(token, authConfig.secret, (err, decoded) => {
         //console.log(err);
-        if(err) {
+        if( err ) {
             return res.status(401).send({ message: 'jwt malformed' });
         }
 
