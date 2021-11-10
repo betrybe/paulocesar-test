@@ -1,11 +1,11 @@
 const mongoose = require('../database');
 
 const RecipeSchema = new mongoose.Schema({
-    name : {
+    name: {
         type: String,
         require: true,
     },
-    ingredients : {
+    ingredients: {
         type: String,
         require: true,
     },
@@ -13,15 +13,15 @@ const RecipeSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    user:{
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         require: true,
     },
-    imgURL:{
+    imgURL: {
         type: String,
-    }
-},{ versionKey: false });
+    },
+}, { versionKey: false } );
 
 const Recipe = mongoose.model('Recipe', RecipeSchema);
 
